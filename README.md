@@ -1,13 +1,13 @@
 # middleware-common-infrastructure [![Build Status](https://travis-ci.org/ChronoBank/middleware-common-infrastructure.svg?branch=master)](https://travis-ci.org/ChronoBank/middleware-common-infrastructure)
 
-### Infrastructure classes for middleware services
+# Infrastructure classes for middleware services
 
 
 ## AmqpService
 
 service for bind on amqp (rabbitmq) and publish messages.
 
-# How to work
+### How to work
 
 Create and bind
 ```
@@ -32,11 +32,11 @@ await rabbit.close();
 
 
 
-### InfrastructureInfo
+## InfrastructureInfo
 
 Service for parsing parameters for InfrastructureService from package.json
 
-# How to work
+### How to work
 ```
 const info = new InfrastructureInfo(require('./package.json'));
 ```
@@ -58,7 +58,8 @@ This service send own version of middleware
     for respond on another middleware checking versions
 ```
 
-# How to work
+### How to work
+
 ```
 const rabbit = new AmqpService('amqp://localhost:5672', 'internal', 'infrastructure');
 const info = new InfrastructureInfo(require('./package.json'));
