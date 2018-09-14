@@ -7,6 +7,7 @@
 
 service for bind on amqp (rabbitmq) and publish messages.
 
+# How to work
 
 Create and bind
 ```
@@ -28,6 +29,20 @@ await rabbit.publishMsg('blockProcessor', {msg: 'test msg'});
 await rabbit.close();
 ```
 
+
+
+
+### InfrastructureInfo
+
+Service for parsing parameters for InfrastructureService from package.json
+
+# How to work
+```
+const info = new InfrastructureInfo(require('./package.json'));
+```
+
+
+
 ## InfrastructureService
 
 service for start infrastructure 
@@ -41,16 +56,6 @@ and if not one middleware return awaited major version
 Also
 This service send own version of middleware 
     for respond on another middleware checking versions
-```
-
-
-
-### InfrastructureInfo
-
-Service for parsing parameters for InfrastructureService from package.json
-
-```
-const info = new InfrastructureInfo(require('./package.json'));
 ```
 
 # How to work
