@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "amqplib": "^0.5.2",
     "bluebird": "^3.5.2",
     "lodash": "^4.17.10"
   },
@@ -19,11 +20,12 @@
   "description": "Middleware common infrastructure",
   "devDependencies": {
     "babel-eslint": "^8.2.6",
+    "bzmq": "^0.1.0",
     "chai": "^4.1.1",
+    "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-plugin-chronobank": "github:chronobank/eslint-plugin-chronobank",
     "memwatch-next": "^0.3.0",
-    "bzmq": "^0.1.0",
     "mocha": "^3.5.0"
   }
 }
