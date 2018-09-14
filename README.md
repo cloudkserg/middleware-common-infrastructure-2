@@ -48,14 +48,12 @@ const info = new InfrastructureInfo(require('./package.json'));
 service for start infrastructure 
 
 ```
-This service checked all requirements of middleware through checkInterval
-and if not one middleware return awaited major version 
-    infrastructure emit InfrastuctureService.REQUIREMENT_ERROR event
-    with data = {requirement: object of Requirement, version: last returned version}
+This service checked all requirements of middleware through checkInterval by rabbitmq
+    If at least for one middleware name not found required major version
+        service emit EVENT=InfrastuctureService.REQUIREMENT_ERROR
+        with data = {requirement: object of Requirement, version: last returned version}
 
-Also
-This service send own version of middleware 
-    for respond on another middleware checking versions
+Also this service send own version when get request from another middleware by rabbitmq
 ```
 
 ### How to work
@@ -64,7 +62,7 @@ This service send own version of middleware
 const rabbit = new AmqpService('amqp://localhost:5672', 'internal', 'infrastructure');
 const info = new InfrastructureInfo(require('./package.json'));
 const infrastructure = new InfrastructureService(info, rabbit, {checkInterval: 10000});
-infrasturcture.on(infrastructure.REQUIREMENT_ERROR, ({requirement, version}) => {
+infrastructure.on(infrastructure.REQUIREMENT_ERROR, ({requirement, version}) => {
     log.error(`Not found requirement with name ${requirement.name} version=${requirement.version}.` +
         ` Last version of this middleware=${version}`);
     process.exit(1);
