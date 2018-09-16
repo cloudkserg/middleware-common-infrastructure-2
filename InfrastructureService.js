@@ -3,12 +3,17 @@
  * Licensed under the AGPL Version 3 license.
  */
 const Promise = require('bluebird'),
-  EventEmitter = require('events');
+  EventEmitter = require('events'),
+  _ = require('lodash'),
+  InfrastructureInfo = require('./InfrastructureInfo'),
+  AmqpService = require('./AmqpService');
 
 const checkingKey = name => `${name}.checking`;
 const checkedKey = name => `${name}.checked`;
 const majorVersion = version => version.split('.')[0];
-const verifyVersion = (version, compareVersion) => majorVersion(version) === majorVersion(compareVersion);
+const verifyVersion = (version, compareVersion) => {
+  return majorVersion(version) === majorVersion(compareVersion);
+};
 
 const CHECKED_MSG = 'checked';
 const CHECKING_MSG = 'checking';
@@ -36,60 +41,94 @@ class InfrastructureService extends EventEmitter
   
   /**
    * Creates an instance of InfrastructureService.
-   * @param {{name: String, version: String, requirements: function(new: ./Requirement[])}} info 
+   * @param {function(new: ./InfrastrutureInfo)} info 
    * @param {function(new: ./AmqpService)} amqpService
    * @param {{checkInterval: String}} options
    * 
    * @memberOf InfrastructureService
    */
-  constructor ({name, version, requirements}, amqpService, {checkInterval = 10000}) {
+  constructor (info, amqpService, options = {}) {
+    if (!info || !(info instanceof InfrastructureInfo))
+      throw new Error('not set right info in params');
+    if (!amqpService || !(amqpService instanceof AmqpService))
+      throw new Error('not set right amqpService in params');
     super();
-    this.name = name;
-    this.version = version;
-    this.requirements = requirements;
+    
+    this.info = info;
     this.rabbit = amqpService;
-    this.checkInterval = checkInterval;
+    this.checkIntervalTime = options.checkIntervalTime || 10000;
+
     this.REQUIREMENT_ERROR = 'requirement_error';
   }
 
 
-  async _checkRequirements () {
-    await Promise.map(this.requirements, this._checkRequirement.bind(this))
+  /**
+   * Function for check all requiements of this object
+   * 
+   * @returns {Boolean}
+   * 
+   * @memberOf InfrastructureService
+   */
+  async checkRequirements () {
+    const verifyResults = await Promise.map(
+      this.info.requirements, this._checkRequirement.bind(this)
+    )
       .catch(e => { throw e; });
-    return true;
+    return _.reduce(verifyResults, (result, item) => (result && item), true);
   }
 
   async _sendMyVersion () {
-    await this.rabbit.publishMsg(checkedKey(this.name), {
-      version: this.version
+    await this.rabbit.publishMsg(checkedKey(this.info.name), {
+      version: this.info.version
     });
   }
-
   _requirementError (requirement, version) {
-    this.emit(this.REQUIREMENT_ERROR, {
-      requirement, version
-    });
+    this.emit(this.REQUIREMENT_ERROR, requirement, version);
   }
 
+  /**
+   * Function for check Requirement
+   * Main function
+   * 
+   * @param {any} requirement 
+   * 
+   * @memberOf InfrastructureService
+   */
   async _checkRequirement (requirement) {
-    this.rabbit.addBind(checkedKey(requirement.name), CHECKED_MSG);
+    // bind on channel with responds from requirements - block.checked, balance.checked...
+    this.rabbit.addBind(checkedKey(requirement.name), checkedKey(requirement.name));
 
     let lastVersion;
-
-    await Promise.all([
-      new Promise(res => this.rabbit.on(CHECKED_MSG, ({version}) => {
+    const verifyResult = await Promise.all([
+      /**
+       * wait respond from requirement on block.checked
+       * get data.version and verify it
+       * 
+       */
+      new Promise(res => this.rabbit.on(checkedKey(requirement.name), ({version}) => {
         lastVersion = version;
-        if (verifyVersion(version, requirement.version))
-          res();
+        if (verifyVersion(version, requirement.version)) 
+          res(true);
       })),
+      /**
+      * publish request to channel = block.checking, balance.checking
+      */
       (async () => {
-        await this.rabbit.publishMsg(checkingKey(requirement.name));
+        await this.rabbit.publishMsg(checkingKey(requirement.name), {
+          version: requirement.version
+        });
+        return true;
       })(),
     ])
       .timeout(requirement.maxWait)
-      .catch(Promise.TimeoutError, this._requirementError.bind(this, requirement, lastVersion));
-
+      .catch(Promise.TimeoutError, () => {
+        this._requirementError(requirement, lastVersion);
+        return false;
+      });
+    // unbind
     this.rabbit.delBind(checkedKey(requirement.name));
+
+    return verifyResult !== false;
   }
 
 
@@ -100,15 +139,35 @@ class InfrastructureService extends EventEmitter
    */
   async start () {
     await this.rabbit.start();
-    await this.rabbit.addBind(checkingKey(this.name), CHECKING_MSG);
+    await this.rabbit.addBind(checkingKey(this.info.name), CHECKING_MSG);
     
     this.rabbit.on(CHECKING_MSG, async () =>  {
       await this._sendMyVersion();
     });
-    
-    setInterval(async () => {
-      this._checkRequirements();
-    }, this.checkInterval);
+
+  }
+
+  /**
+   * Function for check periodically in background down for requirements
+   * 
+   * 
+   * @memberOf InfrastructureService
+   */
+  periodicallyCheck () {
+    this._checkInterval = setInterval(this.checkRequirements.bind(this), 
+      this.checkIntervalTime);
+  }
+
+  /**
+   * Function for close rabbit connections
+   * 
+   * @memberOf InfrastructureService
+   */
+  async close () {
+    if (this._checkInterval)
+      clearInterval(this._checkInterval);
+    await this.rabbit.delBind(checkingKey(this.info.name));
+    await this.rabbit.close();
   }
 }
 module.exports = InfrastructureService;

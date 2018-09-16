@@ -10,10 +10,10 @@
  * @param {Number?} maxWait 
  * @returns {{String, String, Number}}
  */
-module.exports  = (name, version, maxWait = 10000) => {
-  return {
-    name,
-    version,
-    maxWait
-  };
+module.exports  = function Requirement (name, version, maxWait = 500) {
+  if (!version) 
+    throw new Error('not set version');
+  this.name = name;
+  this.version = version;
+  this.maxWait = maxWait;
 };

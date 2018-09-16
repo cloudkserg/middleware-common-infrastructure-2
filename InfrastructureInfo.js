@@ -9,13 +9,15 @@ const _ = require('lodash'),
  * 
  * @param {{String, String, {String => String}}} config 
  */
-module.exports = ({name, version, requirements}) => {
-  return {
-    name,
-    version,
-    requirements: _.chain(requirements)
-      .toPairs()
-      .map(pair => new Requirement(pair[0], pair[1]))
-      .value()
-  };
+module.exports = function InfrastructureInfo ({name, version, requirements}) {
+  if (!version)
+    throw new Error('not set version');
+  if (!(requirements instanceof Object))
+    throw new Error('not set requirements');
+  this.name = name;
+  this.version = version;
+  this.requirements =_.chain(requirements)
+    .toPairs()
+    .map(pair => new Requirement(pair[0], pair[1]))
+    .value();
 };
