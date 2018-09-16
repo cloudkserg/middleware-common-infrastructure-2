@@ -29,6 +29,8 @@ class AmqpService extends EventEmitter
    * 
    */
   constructor (url, exchange, serviceName) {
+    if (!url || !exchange || !serviceName)
+      throw new Error('Not set url, exchange, serverName for constructor');
     super();
     this.url  = url;
     this.exchange = exchange;
@@ -65,9 +67,11 @@ class AmqpService extends EventEmitter
    */
   async addBind (routing, emitMessage) {
     await this.channel.assertQueue(`${this.serviceName}.${routing}`);
-    await this.channel.bindQueue(`${this.serviceName}.${routing}`, this.exchange, routing);
+    await this.channel.bindQueue(`${this.serviceName}.${routing}`, this.exchange, 
+      `${this.serviceName}.${routing}`);
     this.channel.consume(`${this.serviceName}.${routing}`, async (data) => {
-      this.emit(emitMessage, JSON.parse(data.content), data.fields.routingKey);
+      if (data.fields.routingKey === `${this.serviceName}.${routing}`)
+        this.emit(emitMessage, JSON.parse(data.content), data.fields.routingKey);
       this.channel.ack(data);
     });
   }
@@ -109,6 +113,9 @@ class AmqpService extends EventEmitter
   async close () {
     if (this._onClosed && this.channel)
       this.channel.removeListener('close', this._onClosed);
+
+    if (this.channel)
+      await this.channel.close();
     await this.amqpInstance.close();
   }
 }

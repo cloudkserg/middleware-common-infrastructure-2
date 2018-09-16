@@ -17,12 +17,13 @@ describe('core/commonInfrastructure', function () {
     ctx.amqp = {};
     ctx.amqp.instance = await amqp.connect(config.rabbit.url);
     ctx.amqp.channel = await ctx.amqp.instance.createChannel();
-    await ctx.amqp.channel.assertExchange(config.rabbit.exchange, 'internal', {durable: false});
+    await ctx.amqp.channel.assertExchange(config.rabbit.exchange, 'topic', {durable: false});
   });
 
   after (async () => {
     await ctx.amqp.instance.close();
   });
+
 
 
   describe('block', () => blockTests(ctx));

@@ -5,7 +5,8 @@
   "dependencies": {
     "amqplib": "^0.5.2",
     "bluebird": "^3.5.2",
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.10",
+    "nyc": "^13.0.1"
   },
   "scripts": {
     "lint": "node ./node_modules/eslint/bin/eslint.js -c .eslintrc.js --ext .js --fix --ignore-path .eslintignore .",

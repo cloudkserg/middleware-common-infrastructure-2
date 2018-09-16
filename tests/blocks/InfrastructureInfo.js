@@ -16,7 +16,6 @@ module.exports = () => {
   it('construct without right parameters - errors', async () => {
     expect( function () { new InfrastructureInfo({
       name: 11,
-      version: 12,
       badKey: 4
     }); } ).to.throw();
   });
@@ -75,9 +74,9 @@ module.exports = () => {
     expect(info.requirements[0].name).eq('balanceProcessor');
     expect(info.requirements[0].version).eq('1.0.0');
 
-    expect(info.requirements[0]).instanceOf(Requirement);
-    expect(info.requirements[0].name).eq('rest');
-    expect(info.requirements[0].version).eq('2.0.0');
+    expect(info.requirements[1]).instanceOf(Requirement);
+    expect(info.requirements[1].name).eq('rest');
+    expect(info.requirements[1].version).eq('2.0.0');
   });
 
 };

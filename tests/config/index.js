@@ -7,6 +7,6 @@ module.exports = {
   rabbit: {
     exchange: process.env.RABBIT_EXCHANGE || 'internal',
     url: process.env.RABBIT_URI || 'amqp://localhost:5672',
-    serviceName: process.env.RABBIT_SERVICE_NAME || 'tx_service'
+    serviceName: process.env.RABBIT_SERVICE_NAME || 'infrastructure'
   }
 };
