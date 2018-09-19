@@ -5,28 +5,31 @@
   "dependencies": {
     "amqplib": "^0.5.2",
     "bluebird": "^3.5.2",
-    "lodash": "^4.17.10",
-    "nyc": "^13.0.1"
+    "lodash": "^4.17.10"
   },
   "scripts": {
     "lint": "node ./node_modules/eslint/bin/eslint.js -c .eslintrc.js --ext .js --fix --ignore-path .eslintignore .",
-    "test": "node ./node_modules/mocha/bin/mocha -t 90000 tests"
+    "test": "node ./node_modules/mocha/bin/mocha -t 90000",
+    "cov": "nyc --reporter=html --reporter=text mocha -t 90000",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": "chronobank",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/ChronoBank/middleware-common-infrastructure/issues"
+    "url": "https://github.com/cloudkserg/middleware-common-infrastructure/issues"
   },
-  "homepage": "https://github.com/ChronoBank/middleware-common-infrastructure#readme",
+  "homepage": "https://github.com/cloudkserg/middleware-common-infrastructure#readme",
   "description": "Middleware common infrastructure",
   "devDependencies": {
     "babel-eslint": "^8.2.6",
     "bzmq": "^0.1.0",
     "chai": "^4.1.1",
+    "coveralls": "^3.0.2",
     "dotenv": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-plugin-chronobank": "github:chronobank/eslint-plugin-chronobank",
     "memwatch-next": "^0.3.0",
-    "mocha": "^3.5.0"
+    "mocha": "^3.5.0",
+    "nyc": "^13.0.1"
   }
 }

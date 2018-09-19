@@ -49,7 +49,7 @@ module.exports = (ctx) => {
 
     const server = new AmqpService(config.rabbit.url, config.rabbit.exchange, config.rabbit.serviceName);
     await server.start();
-    await server.addBind(routing, 'message');
+    await server.addBind('routing', 'message');
 
     await Promise.all([
       (async () =>{
@@ -75,9 +75,9 @@ module.exports = (ctx) => {
 
     const server = new AmqpService(config.rabbit.url, config.rabbit.exchange, config.rabbit.serviceName);
     await server.start();
-    await server.addBind(secondRouting, 'messageOne');
-    await server.delBind(secondRouting);
-    await server.addBind(routing, 'messageTwo');
+    await server.addBind('test', 'messageOne');
+    await server.delBind('test');
+    await server.addBind('routing', 'messageTwo');
     await Promise.delay(1000);
     await Promise.all([
       (async () =>{
@@ -104,8 +104,8 @@ module.exports = (ctx) => {
 
     const server = new AmqpService(config.rabbit.url, config.rabbit.exchange, config.rabbit.serviceName);
     await server.start();
-    await server.addBind(secondRouting, 'messageOne');
-    await server.addBind(routing, 'messageTwo');
+    await server.addBind('test', 'messageOne');
+    await server.addBind('routing', 'messageTwo');
     await Promise.delay(1000);
     await Promise.all([
       (async () =>{
@@ -173,5 +173,15 @@ module.exports = (ctx) => {
     ]);
     await server.close();
   });
+
+  /*it('start() and close abnormal() - and generate error', async () => {
+        //generate error
+        const server = new AmqpService(config.rabbit.url, config.rabbit.exchange, config.rabbit.serviceName);
+        await server.start();
+        expect(server.amqpInstance.connection.stream._readableState.ended).to.equal(false);
+        expect(server.channel.connection.stream._readableState.ended).to.equal(false);
+        await server.channel.close();
+        await server.close();
+  });*/
 
 };

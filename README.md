@@ -60,16 +60,16 @@ Also this service send own version when get request from another middleware by r
 
 ```
 const rabbit = new AmqpService('amqp://localhost:5672', 'internal', 'infrastructure');
-const info = infrastructureInfo(require('./package.json'));
+const info = InfrastructureInfo(require('./package.json'));
 const infrastructure = new InfrastructureService(info, rabbit, {checkInterval: 10000});
-await infrastruture.start();
+await infrastructure.start();
 infrastructure.on(infrastructure.REQUIREMENT_ERROR, ({requirement, version}) => {
-    log.error(`Not found requirement with name ${requirement.name} version=${requirement.version}.` +
-        ` Last version of this middleware=${version}`);
-    process.exit(1);
-})
+log.error(`Not found requirement with name ${requirement.name} version=${requirement.version}.` +
+    ` Last version of this middleware=${version}`);
+process.exit(1);
+});
 await infrastructure.checkRequirements();
-infrastucture.periodicallyCheck();
+infrastructure.periodicallyCheck();
 ```
 
 ### How close infrastructure
