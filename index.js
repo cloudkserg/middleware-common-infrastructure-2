@@ -4,8 +4,12 @@
  * @author Kirill Sergeev <cloudkserg11@gmail.com>
  */
 const InfrastructureService = require('./InfrastructureService'),
+  InfrastructureInfo = require('./InfrastructureInfo'),
+  Requirement = require('./Requirement'),
   AmqpService = require('./AmqpService');
 module.exports = {
   InfrastructureService,
+  InfrastructureInfo,
+  Requirement,
   AmqpService
 };

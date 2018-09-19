@@ -10,7 +10,7 @@
  * @param {Number?} maxWait 
  * @returns {{String, String, Number}}
  */
-module.exports  = function Requirement (name, version, maxWait = 500) {
+module.exports  = function Requirement (name, version, maxWait = 4000) {
   if (!version) 
     throw new Error('not set version');
   this.name = name;

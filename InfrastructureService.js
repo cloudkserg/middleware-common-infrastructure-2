@@ -15,8 +15,6 @@ const verifyVersion = (version, compareVersion) => {
   return majorVersion(version) === majorVersion(compareVersion);
 };
 
-const CHECKED_MSG = 'checked';
-const CHECKING_MSG = 'checking';
 
 /**
  * Service for checking requirements own dependencies
@@ -139,9 +137,9 @@ class InfrastructureService extends EventEmitter
    */
   async start () {
     await this.rabbit.start();
-    await this.rabbit.addBind(checkingKey(this.info.name), CHECKING_MSG);
+    await this.rabbit.addBind(checkingKey(this.info.name), checkingKey(this.info.name));
     
-    this.rabbit.on(CHECKING_MSG, async () =>  {
+    this.rabbit.on(checkingKey(this.info.name), async () =>  {
       await this._sendMyVersion();
     });
 

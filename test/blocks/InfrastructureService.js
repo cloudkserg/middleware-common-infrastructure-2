@@ -342,7 +342,7 @@ module.exports = (ctx) => {
     await serviceBalance.start();
 
     let balanceError = false;
-    serviceBalance.on(serviceBalance.REQUIREMENT_ERROR, (requirement, version) => {
+    serviceBalance.on(serviceBalance.REQUIREMENT_ERROR, (requirement) => {
       balanceError = true;
     });
 
@@ -386,7 +386,7 @@ module.exports = (ctx) => {
 
 
     let balanceError = false;
-    serviceBalance.on(serviceBalance.REQUIREMENT_ERROR, (requirement, version) => {
+    serviceBalance.on(serviceBalance.REQUIREMENT_ERROR, (requirement) => {
       balanceError = true;
     });
 
@@ -473,6 +473,9 @@ module.exports = (ctx) => {
       })()
     ]);
 
+    clearInterval(serviceBalance._checkInterval);
+    clearInterval(serviceBlock._checkInterval);
+    await Promise.delay(2000);
     await serviceBalance.close();
     await serviceBlock.close();
   });
