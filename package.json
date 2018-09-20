@@ -1,6 +1,6 @@
 {
   "name": "middleware_common_infrastructure",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "dependencies": {
     "amqplib": "^0.5.2",
