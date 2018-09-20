@@ -16,9 +16,9 @@
   "author": "chronobank",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/cloudkserg/middleware-common-infrastructure/issues"
+    "url": "https://gitlab.chronobank.io/chronobank/middleware-common-infrastructure/issues"
   },
-  "homepage": "https://github.com/cloudkserg/middleware-common-infrastructure#readme",
+  "homepage": "https://gitlab.chronobank.io/chronobank/middleware-common-infrastructure#readme",
   "description": "Middleware common infrastructure",
   "devDependencies": {
     "babel-eslint": "^8.2.6",
