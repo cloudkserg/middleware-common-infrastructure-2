@@ -137,6 +137,7 @@ class InfrastructureService extends EventEmitter
    */
   async start () {
     await this.rabbit.start();
+    await this.rabbit.channel.assertExchange(this.rabbit.exchange, 'topic', {durable: false});
     await this.rabbit.addBind(checkingKey(this.info.name), checkingKey(this.info.name));
     
     this.rabbit.on(checkingKey(this.info.name), async () =>  {
