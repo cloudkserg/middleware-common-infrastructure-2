@@ -9,7 +9,7 @@ const _ = require('lodash'),
  * 
  * @param {{String, String, {String => String}}} config 
  */
-module.exports = function InfrastructureInfo ({name, version, requirements}) {
+module.exports = function InfrastructureInfo ({name, version, requirements}, maxWait=10000) {
   if (!version)
     throw new Error('not set version');
   if (!(requirements instanceof Object))
@@ -18,6 +18,6 @@ module.exports = function InfrastructureInfo ({name, version, requirements}) {
   this.version = version;
   this.requirements =_.chain(requirements)
     .toPairs()
-    .map(pair => new Requirement(pair[0], pair[1]))
+    .map(pair => new Requirement(pair[0], pair[1], maxWait))
     .value();
 };
