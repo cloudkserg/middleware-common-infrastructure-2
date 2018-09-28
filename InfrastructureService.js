@@ -94,7 +94,7 @@ class InfrastructureService extends EventEmitter
    */
   async _checkRequirement (requirement) {
     // bind on channel with responds from requirements - block.checked, balance.checked...
-    this.rabbit.addBind(checkedKey(requirement.name), checkedKey(requirement.name));
+    await this.rabbit.addBind(checkedKey(requirement.name), checkedKey(requirement.name));
 
     let lastVersion;
     const verifyResult = await Promise.all([
@@ -124,7 +124,7 @@ class InfrastructureService extends EventEmitter
         return false;
       });
     // unbind
-    this.rabbit.delBind(checkedKey(requirement.name));
+    await this.rabbit.delBind(checkedKey(requirement.name));
 
     return verifyResult !== false;
   }
