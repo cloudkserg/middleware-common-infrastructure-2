@@ -20,7 +20,7 @@ module.exports = () => {
     const info = new Requirement('block', '1.0.0');
     expect(info.name).equal('block');
     expect(info.version).equal('1.0.0');
-    expect(info.maxWait).equal(4000);
+    expect(info.maxWait).equal(10000);
   });
 
 

@@ -93,9 +93,6 @@ class InfrastructureService extends EventEmitter
    * @memberOf InfrastructureService
    */
   async _checkRequirement (requirement) {
-    // bind on channel with responds from requirements - block.checked, balance.checked...
-    await this.rabbit.addBind(checkedKey(requirement.name), checkedKey(requirement.name));
-
     let lastVersion;
     const verifyResult = await Promise.all([
       /**
@@ -123,8 +120,6 @@ class InfrastructureService extends EventEmitter
         this._requirementError(requirement, lastVersion);
         return false;
       });
-    // unbind
-    await this.rabbit.delBind(checkedKey(requirement.name));
 
     return verifyResult !== false;
   }
@@ -139,6 +134,10 @@ class InfrastructureService extends EventEmitter
     await this.rabbit.start();
     await this.rabbit.channel.assertExchange(this.rabbit.exchange, 'topic', {durable: false});
     await this.rabbit.addBind(checkingKey(this.info.name), checkingKey(this.info.name));
+
+    await Promise.mapSeries(this.info.requirements, async (requirement) => {
+        await this.rabbit.addBind(checkedKey(requirement.name), checkedKey(requirement.name));
+    });
     
     this.rabbit.on(checkingKey(this.info.name), async () =>  {
       await this._sendMyVersion();
@@ -166,6 +165,11 @@ class InfrastructureService extends EventEmitter
     if (this._checkInterval)
       clearInterval(this._checkInterval);
     await this.rabbit.delBind(checkingKey(this.info.name));
+    
+    await Promise.mapSeries(this.info.requirements, async (requirement) => {
+        // unbind
+        await this.rabbit.delBind(checkedKey(requirement.name));
+    });
     await this.rabbit.close();
   }
 }
